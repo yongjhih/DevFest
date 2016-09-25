@@ -93,19 +93,20 @@
         ],
 
         properties: {
-          posts: {
-            type: Array,
-            observer: '_postsChanged'
-          },
-
-          _posts: {
-            type: Array
-          }
+          posts: Array,
+          _posts: Array
         },
 
+        observers: [
+          '_postsChanged(posts.splices)'
+        ],
+
         _postsChanged: function () {
-          var temp = this.posts.slice(0, 2);
-          for (var i = 0, len = temp.length; i < len; i++) {
+          if (!this.posts.length) {return;}
+          var rawPosts = this.posts;
+          rawPosts.sort(function(a, b){return new Date(b.posted) - new Date(a.posted);});
+          var temp = rawPosts.slice(0,2);
+          for (let i = 0, len = temp.length; i < len; i++) {
             temp[i].url = '/blog/posts/' + temp[i].id + '/';
           }
           this._posts = temp;

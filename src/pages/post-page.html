@@ -132,7 +132,7 @@
     <div id="animationWrapper">
       <div class="post-wrapper">
         <div class="container" cascaded>
-          <marked-element class="post-content" markdown="[[postBody]]">
+          <marked-element class="post-content" markdown="[[_post.fullText]]">
             <div class="markdown-html"></div>
           </marked-element>
 
@@ -195,8 +195,8 @@
       <paper-spinner id="spinner" active></paper-spinner>
     </div>
 
-    <iron-ajax id="ajax" url="[[_postUrl]]" handle-as="text" last-response="{{postBody}}"
-               on-response="_postLoaded"></iron-ajax>
+    <!--<iron-ajax id="ajax" url="[[_postUrl]]" handle-as="text" last-response="{{postBody}}"-->
+               <!--on-response="_postLoaded"></iron-ajax>-->
 
   </template>
 
@@ -299,23 +299,28 @@
         },
 
         _postChanged: function () {
-          if (this.postId) {
+          if (this.postId && this.posts.length) {
             this.$.animationWrapper.style.opacity = 0;
             this.$.animationWrapper.style.display = 'none';
             this.$.spinner.style.opacity = 1;
 
             var postIndex = this._getIndexByProperty(this.posts, 'id', this.postId);
+            if (postIndex >= 0) {
 
-            this._latestPosts[0] = postIndex > 0 ? this.posts[postIndex - 1] : null;
-            this._latestPosts[1] = postIndex < this.posts.length - 1 ? this.posts[postIndex + 1] : null;
-            this.notifyPath('_latestPosts', this._latestPosts.slice());
 
-            this._post = this.posts[postIndex];
-            this._updateHeaderSettings();
-            this.notifyPath('_post.date', new Date(this._post.posted).toDateString().slice(4));
+              this._latestPosts[0] = postIndex > 0 ? this.posts[postIndex - 1] : null;
+              this._latestPosts[1] = postIndex < this.posts.length - 1 ? this.posts[postIndex + 1] : null;
+              this.notifyPath('_latestPosts', this._latestPosts.slice());
 
-            this._postUrl = '/data/posts/' + this._post.posted + '-' + this.postId + '.markdown';
-            this.$.ajax.generateRequest();
+              this._post = this.posts[postIndex];
+              this._updateHeaderSettings();
+              this.notifyPath('_post.date', new Date(this._post.posted).toDateString().slice(4));
+
+              this._postUrl = '/data/posts/' + this._post.posted + '-' + this.postId + '.markdown';
+//            this.$.ajax.generateRequest();
+              this._postLoaded();
+            }
+
           }
         },
 
