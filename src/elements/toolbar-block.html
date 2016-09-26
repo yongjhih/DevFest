@@ -7,6 +7,7 @@
 
 <link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
 <link rel="import" href="../styles/shared-styles.html">
@@ -21,6 +22,7 @@
     <style include="shared-styles">
       :host {
         --header-color: #fff;
+        --paper-menu-button-dropdown-background: #fff;
 
         --paper-tabs: {
           height: 64px;
@@ -55,6 +57,7 @@
       paper-tab {
         flex: none;
         padding: 0 10px;
+        text-transform: uppercase;
       }
 
       .nav-link {
@@ -72,6 +75,58 @@
         color: var(--header-background);
         background: var(--header-color);
         font-size: 13px;
+      }
+
+      .signin-tab {
+        font-size: 14px;
+        font-weight: 500;
+        --paper-tab-content-unselected: {
+          opacity: 1;
+        };
+      }
+
+      .auth-wrapper {
+        margin-left: 16px;
+      }
+
+      .profile-image {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-position: center;
+        background-size: cover;
+      }
+
+      .signin-panel {
+        background: #fff;
+        color: var(--text-primary-color);
+      }
+
+      .profile-details {
+        padding: 16px;
+        border-bottom: 1px solid var(--divider-color);
+      }
+
+      .profile-details .profile-image {
+        margin-right: 8px;
+      }
+
+      .profile-name,
+      .profile-email {
+        font-size: 14px;
+        display: block;
+        color: var(--secondary-text-color);
+      }
+
+      .profile-content {
+        padding: 8px 16px;
+      }
+
+      .profile-action {
+        text-transform: uppercase;
+        color: var(--default-primary-color);
+        font-size: 14px;
+        cursor: pointer;
       }
     </style>
 
@@ -98,11 +153,40 @@
               </paper-tab>
             </template>
           </paper-tabs>
+
+          <template is="dom-if" if="[[!app.user]]">
+            <paper-tab class="signin-tab" on-tap="signIn">[[localize('sign-in')]]</paper-tab>
+          </template>
           <div class="action-button-wrapper" layout horizontal center-center>
             <a href$="[[app.data.tickets.url]]" target="_blank" rel="noopener noreferrer" on-tap="_trackBuyClick">
               <paper-button class="action-button">[[localize('buy-ticket')]]</paper-button>
             </a>
           </div>
+          <template is="dom-if" if="[[app.user]]">
+            <div class="auth-wrapper" layout horizontal center-center>
+              <paper-menu-button vertical-align="top" horizontal-align="right">
+                <div
+                  class="profile-image dropdown-trigger"
+                  style="background-image: url('[[app.user.photoURL]]')"
+                ></div>
+                <div class="signin-panel dropdown-content">
+                  <div class="profile-details" layout horizontal>
+                    <div
+                      class="profile-image dropdown-trigger"
+                      style="background-image: url('[[app.user.photoURL]]')"
+                    ></div>
+                    <div layout vertical center-justified>
+                      <span class="profile-name">[[app.user.displayName]]</span>
+                      <span class="profile-email">[[app.user.email]]</span>
+                    </div>
+                  </div>
+                  <div class="profile-content">
+                    <span class="profile-action" role="button" on-tap="signOut">[[localize('sign-out')]]</span>
+                  </div>
+                </div>
+              </paper-menu-button>
+            </div>
+          </template>
         </template>
       </div>
     </app-toolbar>
@@ -134,6 +218,14 @@
 
         togglePanel: function () {
           HOVERBOARD.Elements.Template.toggleDrawer();
+        },
+
+        signIn: function () {
+          HOVERBOARD.Elements.Template.signIn();
+        },
+
+        signOut: function () {
+          HOVERBOARD.Elements.Template.signOut();
         },
 
         _stylesChanged: function (headerSettings) {
