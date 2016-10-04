@@ -12,7 +12,7 @@
 <link rel="import" href="/bower_components/polymerfire/polymerfire.html">
 
 
-<dom-module id="schedule-day">
+<dom-module id="my-schedule">
 
   <template>
 
@@ -23,7 +23,7 @@
       data="{{app.user.sessions}}">
     </firebase-document>
 
-   <style include="shared-styles">
+    <style include="shared-styles">
       :host {
         display: block;
         --paper-card-background-color: var(--secondary-background-color);
@@ -122,7 +122,7 @@
       }
 
       .speaker-block {
-        padding: 12px 24px;
+        padding: 16px 24px;
         color: #fff;
       }
 
@@ -131,39 +131,19 @@
         opacity: 0.85;
       }
 
-      .sub-session[wide]:hover .image-overlay,
-      .sub-session[wide]:hover .action-icon {
+      .sub-session:hover .image-overlay {
         opacity: 1;
       }
 
-      .sub-session[with-background][wide] .image-overlay,
-      .sub-session[with-background][wide]:hover .image-overlay {
+      .sub-session[with-background] .image-overlay,
+      .sub-session[with-background]:hover .image-overlay {
         opacity: 0;
       }
 
-      .bottom-caption {
+      .tags {
         padding: 16px 24px;
-        font-size: 13px;
         color: var(--secondary-text-color);
-      }
-
-      .action-icon {
-        --iron-icon-width: 20px;
-        --iron-icon-height: 20px;
-        margin-left: 16px;
-      }
-
-      .sub-session[with-background][wide] .action-icon {
-        color: #fff;
-      }
-
-      .sub-session[wide] .action-icon {
-        opacity: 0;
-        transition: opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      .sub-session[wide] .action-icon.show {
-        opacity: 1;
+        font-size: 13px;
       }
 
       .sub-session-content iron-icon {
@@ -176,12 +156,20 @@
         margin-right: 8px;
       }
 
-      .speaker {
-        margin: 4px 0;
+      .add:hover{
+        color: #FF9800;
+      }
+
+      .remove:hover{
+        color: #673ab7;
+      }
+      .add-schedule {
+        padding: 16px 24px;
+        color: var(--secondary-text-color);
       }
 
       .speaker:not(:last-of-type) {
-        margin-right: 24px;
+        margin-bottom: 8px;
       }
 
       .person-detail {
@@ -195,8 +183,17 @@
       }
     </style>
 
-    <template is="dom-repeat" items="[[day.timeslots]]" as="timeslot">
-      <div class="timeslot" layout vertical$="{{app.isPhoneSize}}" horizontal$="{{!app.isPhoneSize}}">
+
+      <template is="dom-repeat" items="[[schedule]]" as="day">
+        <div class="timeslot" layout vertical>
+          <div class="start-time">
+            <span class="hours">[[day.dateReadable]]</span>
+          </div>
+        </div>
+
+        <template is="dom-if" if="[[app.user.sessions.ids]]">
+        <template is="dom-repeat" items="[[_getTimeslots(day.timeslots)]]" as="timeslot">
+          <div class="timeslot" layout vertical$="{{app.isPhoneSize}}" horizontal$="{{!app.isPhoneSize}}">
 
         <div class="start-time">
           <span class="hours">[[_splitText(timeslot.startTime, ':', 0)]]</span>
@@ -210,8 +207,7 @@
               <template is="dom-repeat" items="[[session]]" as="subSession"
                         filter="{{_filterSession(filters.splices)}}">
 
-                <a href$="/schedule/[[name]]?sessionId=[[subSession.id]]" class="sub-session"
-                   with-background$="[[subSession.image]]" layout flex-auto wide$="{{!app.isPhoneSize}}">
+                <a href$="/schedule/[[name]]?sessionId=[[subSession.id]]" class="sub-session" with-background$="[[subSession.image]]" layout flex-auto>
                   <paper-card layout flex-auto>
 
                     <template is="dom-if" if="[[subSession.image]]">
@@ -220,39 +216,35 @@
 
                     <div class="overlay" relative layout vertical flex>
                       <div class="sub-session-content" flex>
-                          <h2 class="session-title">[[subSession.title]]</h2>
-                          <ul class="session-meta">
-                            <template is="dom-if" if="[[subSession.language]]">
-                              <li>[[subSession.language]]</li>
-                            </template>
-                            <template is="dom-if" if="[[subSession.complexity]]">
-                              <li>[[subSession.complexity]]</li>
-                            </template>
-                            <template is="dom-if" if="[[subSession.track.title]]">
-                              <li>[[subSession.track.title]]</li>
-                            </template>
-                          </ul>
-                     </div>
-
-                      <div class="bottom-caption" layout horizontal center justified>
-                        <div class="tags" layout horizontal center flex>
-                          <template is="dom-if" if="[[subSession.tags]]">
-                            <iron-icon icon="tags"></iron-icon>
-                            <span>[[_joinArray(subSession.tags)]]</span>
+                        <h2 class="session-title">[[subSession.title]]</h2>
+                        <ul class="session-meta">
+                          <template is="dom-if" if="[[subSession.language]]">
+                            <li>[[subSession.language]]</li>
                           </template>
-                        </div>
-                        <template is="dom-if" if="[[app.user]]">
-                          <iron-icon
-                            class="action-icon"
-                            icon="[[_getFavoriteIcon(subSession)]]"
-                            on-tap="_toggleFavorites"
-                            session-id="[[subSession.id]]"
-                          ></iron-icon>
-                        </template>
+                          <template is="dom-if" if="[[subSession.complexity]]">
+                            <li>[[subSession.complexity]]</li>
+                          </template>
+                          <template is="dom-if" if="[[subSession.track.title]]">
+                            <li>[[subSession.track.title]]</li>
+                          </template>
+                        </ul>
                       </div>
 
+                      <template is="dom-if" if="[[app.user]]">
+                        <div class="add-schedule" layout horizontal center>
+                          <iron-icon id= "[[subSession.id]]" class="remove" icon="remove" on-click="_removeSchedule"></iron-icon>
+                        </div>
+                      </template>
+
+                     <template is="dom-if" if="[[subSession.tags]]">
+                        <div class="tags" layout horizontal center>
+                          <iron-icon icon="tags"></iron-icon>
+                          <span>[[_joinArray(subSession.tags)]]</span>
+                        </div>
+                      </template>
+
                       <template is="dom-if" if="[[subSession.speakers]]">
-                        <div class="speaker-block" layout horizontal wrap relative>
+                        <div class="speaker-block" relative>
                           <div class="image-overlay"
                                style$="background-color: [[_getCustomStyleValue(subSession.mainTag)]]" fit></div>
                           <template is="dom-repeat" items="[[subSession.speakers]]" as="speaker">
@@ -280,7 +272,8 @@
 
       </div>
     </template>
-
+      </template>
+    </template>
   </template>
 
   <script>
@@ -289,7 +282,7 @@
 
       Polymer({
 
-        is: 'schedule-day',
+        is: 'my-schedule',
 
         behaviors: [
           Polymer.NeonSharedElementAnimatableBehavior,
@@ -301,18 +294,12 @@
             type: Object
           },
 
+          schedule: {
+            type: Array
+          },
+
           day: {
             type: Object
-          },
-
-          addIcon: {
-            type: String,
-            value: 'add'
-          },
-
-          removeIcon: {
-            type: String,
-            value: 'remove'
           },
 
           userSessionsPath: {
@@ -347,41 +334,40 @@
           }
         },
 
-        _addSchedule : function(e) {
-          var newIconName = e.currentTarget.className == this.addIcon ? this.removeIcon : this.addIcon;
-          var currentId = String(e.currentTarget.id);
-          var index = -1;
-          if (this.app.user.sessions && this.app.user.sessions.ids) {
-            index = this.app.user.sessions.ids.indexOf(currentId);
-          }
+        _getTimeslots(timeslots) {
+          var userTimeslots = [];
+          var savedSessionsIds = this.app.user.sessions.ids;
 
-          if (e.currentTarget.className == this.addIcon ) {
-              if (!this.app.user.sessions || !this.app.user.sessions.ids) {
-                this.app.user.sessions = {ids: []}
+          timeslots.map(function(timeslot) {
+            var userSessions = [];
+            var userTimeSlot = timeslot;
+            timeslot.sessions.map(function(session) {
+              if (savedSessionsIds.indexOf(String(session[0].id)) >= 0) {
+                userSessions.push(session);
               }
+            });
 
-            if (index < 0) {
-              this.app.user.sessions.ids.push(currentId);
+            if (userSessions.length) {
+              userTimeSlot.sessions = userSessions;
+              userTimeslots.push(userTimeSlot);
             }
+          });
+          return userTimeslots;
+        },
+
+        _removeSchedule : function(e) {
+          var currentId = String(e.currentTarget.id);
+          var index = this.app.user.sessions.ids.indexOf(currentId);
+
+          if (index >= 0) {
+            this.app.user.sessions.ids.splice(index, 1);
           }
-          else if (index >= 0) {
-              this.app.user.sessions.ids.splice(index, 1);
-          }
+          e.currentTarget.parentElement.parentElement.parentElement.style.display = "none";
 
           this.$.userSessions.data = this.app.user.sessions;
           this.$.userSessions.save(this.userSessionsPath, String(this.app.user.uid));
-          e.currentTarget.setAttribute('icon', newIconName);
-          e.currentTarget.className = newIconName;
-
           e.preventDefault();
           e.stopPropagation();
-        },
-
-        _getIcon: function(id) {
-          if (!this.app.user.sessions || !this.app.user.sessions.ids) {
-           return this.addIcon;
-          }
-          return this.app.user.sessions.ids.indexOf(String(id)) <= 0 ? this.addIcon : this.removeIcon;
         },
 
         _splitText: function (text, divider, index) {
@@ -402,28 +388,6 @@
           return function (session) {
             return filters.indexOf(session.mainTag) > -1;
           };
-        },
-
-        _toggleFavorites: function (e) {
-          e.stopPropagation();
-          e.preventDefault();
-          var id = e.target.sessionId;
-          var arrayIndex = this.app.favorites.indexOf(id);
-          this.app.favorites = this.app.favorites || [];
-          if (arrayIndex < 0) {
-            this.app.favorites.push(id);
-            e.target.icon = 'favorite';
-            e.target.classList.add('show');
-          } else {
-            this.app.favorites.splice(arrayIndex, 1);
-            e.target.icon = 'favorite-border';
-            e.target.classList.remove('show');
-          }
-        },
-
-        _getFavoriteIcon: function (id) {
-          this.app.favorites = this.app.favorites || [];
-          return this.app.favorites.indexOf(id) > -1 ? 'favorite' : 'favorite-border';
         }
 
       });

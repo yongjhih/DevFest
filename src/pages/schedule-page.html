@@ -12,6 +12,8 @@
 
 <link rel="import" href="../elements/schedule-subnav.html">
 <link rel="import" href="../elements/schedule-day.html">
+<link rel="import" href="../elements/my-schedule.html">
+
 <link rel="import" href="../elements/session-details.html">
 <link rel="import" href="../behaviors/utils-behavior.html">
 <link rel="import" href="../behaviors/page-behavior.html">
@@ -59,6 +61,13 @@
             day="[[day]]"
             filters="[[filters]]"
           ></schedule-day>
+        </template>
+        <template is="dom-if" if="[[app.user]]">
+          <my-schedule
+            name="myschedule"
+            app={{app}}
+            schedule="[[schedule]]"
+          ></my-schedule>
         </template>
       </neon-animated-pages>
     </div>
