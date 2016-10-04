@@ -241,10 +241,10 @@
                             <span>[[_joinArray(subSession.tags)]]</span>
                           </template>
                         </div>
-                        <template is="dom-if" if="[[app.user]]">
+                        <template is="dom-if" if="[[app.user.sessions.length]]">
                           <iron-icon
-                            class="action-icon"
-                            icon="[[_getFavoriteIcon(subSession)]]"
+                            class$="[[_getFavoriteIconClass(subSession.id)]]"
+                            icon="[[_getFavoriteIcon(subSession.id)]]"
                             on-tap="_toggleFavorites"
                             session-id="[[subSession.id]]"
                           ></iron-icon>
@@ -317,7 +317,7 @@
 
           userSessionsPath: {
             type: String,
-            value: '/userSessions'
+            value: '/userSessions2'
           },
 
           filters: {
@@ -347,43 +347,6 @@
           }
         },
 
-        _addSchedule : function(e) {
-          var newIconName = e.currentTarget.className == this.addIcon ? this.removeIcon : this.addIcon;
-          var currentId = String(e.currentTarget.id);
-          var index = -1;
-          if (this.app.user.sessions && this.app.user.sessions.ids) {
-            index = this.app.user.sessions.ids.indexOf(currentId);
-          }
-
-          if (e.currentTarget.className == this.addIcon ) {
-              if (!this.app.user.sessions || !this.app.user.sessions.ids) {
-                this.app.user.sessions = {ids: []}
-              }
-
-            if (index < 0) {
-              this.app.user.sessions.ids.push(currentId);
-            }
-          }
-          else if (index >= 0) {
-              this.app.user.sessions.ids.splice(index, 1);
-          }
-
-          this.$.userSessions.data = this.app.user.sessions;
-          this.$.userSessions.save(this.userSessionsPath, String(this.app.user.uid));
-          e.currentTarget.setAttribute('icon', newIconName);
-          e.currentTarget.className = newIconName;
-
-          e.preventDefault();
-          e.stopPropagation();
-        },
-
-        _getIcon: function(id) {
-          if (!this.app.user.sessions || !this.app.user.sessions.ids) {
-           return this.addIcon;
-          }
-          return this.app.user.sessions.ids.indexOf(String(id)) <= 0 ? this.addIcon : this.removeIcon;
-        },
-
         _splitText: function (text, divider, index) {
           return text.split(divider)[index];
         },
@@ -407,23 +370,59 @@
         _toggleFavorites: function (e) {
           e.stopPropagation();
           e.preventDefault();
-          var id = e.target.sessionId;
-          var arrayIndex = this.app.favorites.indexOf(id);
-          this.app.favorites = this.app.favorites || [];
+          var id = e.target.sessionId.toString();
+//          var arrayIndex = -1;
+
+          this.app.user.sessions = Object.keys(this.app.user.sessions).length !== 0 ? this.app.user.sessions : [];
+
+//          if (this.app.user.sessions) {
+//            arrayIndex = this.app.user.sessions.ids.indexOf(id);
+//          debugger;
+            var arrayIndex = this.app.user.sessions.indexOf(id);
+//          }
+
+//          if (!this.app.user.sessions || !this.app.user.sessions.ids) {
+//            this.app.user.sessions = {ids: []}
+//          }
+
           if (arrayIndex < 0) {
-            this.app.favorites.push(id);
+//            this.app.user.sessions.ids.push(id);
+            this.app.user.sessions.push(id);
             e.target.icon = 'favorite';
             e.target.classList.add('show');
           } else {
-            this.app.favorites.splice(arrayIndex, 1);
+//            this.app.user.sessions.ids.splice(arrayIndex, 1);
+            this.app.user.sessions.splice(arrayIndex, 1);
             e.target.icon = 'favorite-border';
             e.target.classList.remove('show');
           }
+
+          debugger;
+          this.$.userSessions.data = this.app.user.sessions;
+          this.$.userSessions.save(this.userSessionsPath, this.app.user.uid);
         },
 
         _getFavoriteIcon: function (id) {
-          this.app.favorites = this.app.favorites || [];
-          return this.app.favorites.indexOf(id) > -1 ? 'favorite' : 'favorite-border';
+//          if (!this.app.user.sessions || !this.app.user.sessions.ids) {
+//            this.app.user.sessions = {ids: []}
+//          }
+
+//          this.app.user.sessions = this.app.user.sessions || [];
+//          if (!this.app.user.sessions) return 'favorite-border';
+          this.app.user.sessions = Object.keys(this.app.user.sessions || {}).length !== 0 ? this.app.user.sessions : [];
+console.log(this.app.user.sessions, id.toString(), this.app.user.sessions.indexOf(id.toString()));
+
+
+//          return this.app.user.sessions.ids.indexOf(id) > -1 ? 'favorite' : 'favorite-border';
+          return this._isFavorite(id) ? 'favorite' : 'favorite-border';
+        },
+
+        _getFavoriteIconClass: function (id) {
+          return 'action-icon' + (this._isFavorite(id) ? ' show' : '');
+        },
+
+        _isFavorite: function(id) {
+          return this.app.user.sessions.indexOf(id.toString()) > -1;
         }
 
       });
