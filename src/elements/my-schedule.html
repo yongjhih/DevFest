@@ -340,14 +340,16 @@
 
           timeslots.map(function(timeslot) {
             var userSessions = [];
+            var userTimeSlot = timeslot;
             timeslot.sessions.map(function(session) {
-              if (savedSessionsIds.indexOf(String(session[0].id)) > 0) {
+              if (savedSessionsIds.indexOf(String(session[0].id)) >= 0) {
                 userSessions.push(session);
               }
             });
 
             if (userSessions.length) {
-              userTimeslots.push(timeslot);
+              userTimeSlot.sessions = userSessions;
+              userTimeslots.push(userTimeSlot);
             }
           });
           return userTimeslots;
@@ -355,9 +357,10 @@
 
         _removeSchedule : function(e) {
           var currentId = String(e.currentTarget.id);
+          var index = this.app.user.sessions.ids.indexOf(currentId);
 
-          if (this.app.user.sessions.ids.indexOf(currentId) > 0) {
-            this.app.user.sessions.ids.pop(currentId);
+          if (index >= 0) {
+            this.app.user.sessions.ids.splice(index, 1);
           }
           e.currentTarget.parentElement.parentElement.parentElement.style.display = "none";
 
@@ -365,13 +368,6 @@
           this.$.userSessions.save(this.userSessionsPath, String(this.app.user.uid));
           e.preventDefault();
           e.stopPropagation();
-        },
-
-        _getIcon: function(id) {
-          if (!this.app.user.sessions || !this.app.user.sessions.ids) {
-            return this.addIcon;
-          }
-          return this.app.user.sessions.ids.indexOf(String(id)) <= 0 ? this.addIcon : this.removeIcon;
         },
 
         _splitText: function (text, divider, index) {

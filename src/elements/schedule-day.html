@@ -333,15 +333,22 @@
         _addSchedule : function(e) {
           var newIconName = e.currentTarget.className == this.addIcon ? this.removeIcon : this.addIcon;
           var currentId = String(e.currentTarget.id);
+          var index = -1;
+          if (this.app.user.sessions && this.app.user.sessions.ids) {
+            index = this.app.user.sessions.ids.indexOf(currentId);
+          }
 
           if (e.currentTarget.className == this.addIcon ) {
               if (!this.app.user.sessions || !this.app.user.sessions.ids) {
                 this.app.user.sessions = {ids: []}
               }
-              this.app.user.sessions.ids.push(e.currentTarget.id);
+
+            if (index < 0) {
+              this.app.user.sessions.ids.push(currentId);
+            }
           }
-          else if (this.app.user.sessions.ids.indexOf(currentId) > 0) {
-              this.app.user.sessions.ids.pop(currentId);
+          else if (index >= 0) {
+              this.app.user.sessions.ids.splice(index, 1);
           }
 
           this.$.userSessions.data = this.app.user.sessions;
