@@ -122,19 +122,39 @@
         opacity: 0.85;
       }
 
-      .sub-session:hover .image-overlay {
+      .sub-session[wide]:hover .image-overlay,
+      .sub-session[wide]:hover .action-icon {
         opacity: 1;
       }
 
-      .sub-session[with-background] .image-overlay,
-      .sub-session[with-background]:hover .image-overlay {
+      .sub-session[with-background][wide] .image-overlay,
+      .sub-session[with-background][wide]:hover .image-overlay {
         opacity: 0;
       }
 
-      .tags {
+      .bottom-caption {
         padding: 16px 24px;
-        color: var(--secondary-text-color);
         font-size: 13px;
+        color: var(--secondary-text-color);
+      }
+
+      .action-icon {
+        --iron-icon-width: 20px;
+        --iron-icon-height: 20px;
+        margin-left: 16px;
+      }
+
+      .sub-session[with-background][wide] .action-icon {
+        color: #fff;
+      }
+
+      .sub-session[wide] .action-icon {
+        opacity: 0;
+        transition: opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .sub-session[favorite] .action-icon {
+        opacity: 1;
       }
 
       .tags iron-icon {
@@ -177,7 +197,9 @@
               <template is="dom-repeat" items="[[session]]" as="subSession"
                         filter="{{_filterSession(filters.splices)}}">
 
-                <a href$="/schedule/[[name]]?sessionId=[[subSession.id]]" class="sub-session" with-background$="[[subSession.image]]" layout flex-auto>
+                <a href$="/schedule/[[name]]?sessionId=[[subSession.id]]" class="sub-session"
+                   with-background$="[[subSession.image]]" layout flex-auto wide$="{{!app.isPhoneSize}}"
+                   favorite$="{{_isFavorite(subSession.id)}}">
                   <paper-card layout flex-auto>
 
                     <template is="dom-if" if="[[subSession.image]]">
@@ -201,12 +223,20 @@
                         </ul>
                       </div>
 
-                      <template is="dom-if" if="[[subSession.tags]]">
-                        <div class="tags" layout horizontal center>
-                          <iron-icon icon="tags"></iron-icon>
-                          <span>[[_joinArray(subSession.tags)]]</span>
+                      <div class="bottom-caption" layout horizontal center justified>
+                        <div class="tags" layout horizontal center flex>
+                          <template is="dom-if" if="[[subSession.tags]]">
+                            <iron-icon icon="tags"></iron-icon>
+                            <span>[[_joinArray(subSession.tags)]]</span>
+                          </template>
                         </div>
-                      </template>
+                        <iron-icon
+                          class="action-icon"
+                          icon="[[_getFavoriteIcon(subSession.id)]]"
+                          on-tap="_toggleFavorites"
+                          session-id="[[subSession.id]]"
+                        ></iron-icon>
+                      </div>
 
                       <template is="dom-if" if="[[subSession.speakers]]">
                         <div class="speaker-block" layout horizontal wrap relative>
@@ -307,6 +337,30 @@
           return function (session) {
             return filters.indexOf(session.mainTag) > -1;
           };
+        },
+
+        _toggleFavorites: function (e) {
+          e.stopPropagation();
+          e.preventDefault();
+          var id = e.target.sessionId;
+          var arrayIndex = this.app.favorites.indexOf(id);
+          this.app.favorites = this.app.favorites || [];
+          console.log(id);
+          if (arrayIndex < 0) {
+            this.app.favorites.push(id);
+          } else {
+            this.app.favorites.splice(arrayIndex, 1);
+          }
+          console.log(this.app.favorites);
+        },
+
+        _getFavoriteIcon: function (id) {
+          return this._isFavorite(id) ? 'favorite' : 'favorite-border';
+        },
+
+        _isFavorite: function (id) {
+          this.app.favorites = this.app.favorites || [];
+          return this.app.favorites.indexOf(id) > -1;
         }
 
       });
