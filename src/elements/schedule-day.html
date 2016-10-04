@@ -166,10 +166,6 @@
         opacity: 1;
       }
 
-      .sub-session-content iron-icon {
-        --iron-icon-fill-color: var(--secondary-text-color);
-      }
-
       .tags iron-icon {
         --iron-icon-width: 14px;
         --iron-icon-height: 14px;
@@ -241,7 +237,7 @@
                             <span>[[_joinArray(subSession.tags)]]</span>
                           </template>
                         </div>
-                        <template is="dom-if" if="[[app.user.sessions.length]]">
+                        <template is="dom-if" if="[[app.user.sessions]]">
                           <iron-icon
                             class$="[[_getFavoriteIconClass(subSession.id)]]"
                             icon="[[_getFavoriteIcon(subSession.id)]]"
@@ -305,19 +301,9 @@
             type: Object
           },
 
-          addIcon: {
-            type: String,
-            value: 'add'
-          },
-
-          removeIcon: {
-            type: String,
-            value: 'remove'
-          },
-
           userSessionsPath: {
             type: String,
-            value: '/userSessions2'
+            value: '/userSessions'
           },
 
           filters: {
@@ -371,49 +357,28 @@
           e.stopPropagation();
           e.preventDefault();
           var id = e.target.sessionId.toString();
-//          var arrayIndex = -1;
-
           this.app.user.sessions = Object.keys(this.app.user.sessions).length !== 0 ? this.app.user.sessions : [];
-
-//          if (this.app.user.sessions) {
-//            arrayIndex = this.app.user.sessions.ids.indexOf(id);
-//          debugger;
-            var arrayIndex = this.app.user.sessions.indexOf(id);
-//          }
-
-//          if (!this.app.user.sessions || !this.app.user.sessions.ids) {
-//            this.app.user.sessions = {ids: []}
-//          }
+          var arrayIndex = this.app.user.sessions.indexOf(id);
 
           if (arrayIndex < 0) {
-//            this.app.user.sessions.ids.push(id);
             this.app.user.sessions.push(id);
             e.target.icon = 'favorite';
             e.target.classList.add('show');
           } else {
-//            this.app.user.sessions.ids.splice(arrayIndex, 1);
             this.app.user.sessions.splice(arrayIndex, 1);
             e.target.icon = 'favorite-border';
             e.target.classList.remove('show');
           }
 
-          debugger;
           this.$.userSessions.data = this.app.user.sessions;
           this.$.userSessions.save(this.userSessionsPath, this.app.user.uid);
         },
 
         _getFavoriteIcon: function (id) {
-//          if (!this.app.user.sessions || !this.app.user.sessions.ids) {
-//            this.app.user.sessions = {ids: []}
-//          }
+          this.app.user.sessions = Object.keys(this.app.user.sessions || {}).length !== 0
+                                    ? this.app.user.sessions
+                                    : [];
 
-//          this.app.user.sessions = this.app.user.sessions || [];
-//          if (!this.app.user.sessions) return 'favorite-border';
-          this.app.user.sessions = Object.keys(this.app.user.sessions || {}).length !== 0 ? this.app.user.sessions : [];
-console.log(this.app.user.sessions, id.toString(), this.app.user.sessions.indexOf(id.toString()));
-
-
-//          return this.app.user.sessions.ids.indexOf(id) > -1 ? 'favorite' : 'favorite-border';
           return this._isFavorite(id) ? 'favorite' : 'favorite-border';
         },
 

@@ -122,7 +122,7 @@
       }
 
       .speaker-block {
-        padding: 16px 24px;
+        padding: 12px 24px;
         color: #fff;
       }
 
@@ -131,23 +131,39 @@
         opacity: 0.85;
       }
 
-      .sub-session:hover .image-overlay {
+      .sub-session[wide]:hover .image-overlay,
+      .sub-session[wide]:hover .action-icon {
         opacity: 1;
       }
 
-      .sub-session[with-background] .image-overlay,
-      .sub-session[with-background]:hover .image-overlay {
+      .sub-session[with-background][wide] .image-overlay,
+      .sub-session[with-background][wide]:hover .image-overlay {
         opacity: 0;
       }
 
-      .tags {
+      .bottom-caption {
         padding: 16px 24px;
-        color: var(--secondary-text-color);
         font-size: 13px;
+        color: var(--secondary-text-color);
       }
 
-      .sub-session-content iron-icon {
-        --iron-icon-fill-color: var(--secondary-text-color);
+      .action-icon {
+        --iron-icon-width: 20px;
+        --iron-icon-height: 20px;
+        margin-left: 16px;
+      }
+
+      .sub-session[with-background][wide] .action-icon {
+        color: #fff;
+      }
+
+      .sub-session[wide] .action-icon {
+        opacity: 0;
+        transition: opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .sub-session[wide] .action-icon.show {
+        opacity: 1;
       }
 
       .tags iron-icon {
@@ -156,20 +172,12 @@
         margin-right: 8px;
       }
 
-      .add:hover{
-        color: #FF9800;
-      }
-
-      .remove:hover{
-        color: #673ab7;
-      }
-      .add-schedule {
-        padding: 16px 24px;
-        color: var(--secondary-text-color);
+      .speaker {
+        margin: 4px 0;
       }
 
       .speaker:not(:last-of-type) {
-        margin-bottom: 8px;
+        margin-right: 24px;
       }
 
       .person-detail {
@@ -191,7 +199,7 @@
           </div>
         </div>
 
-        <template is="dom-if" if="[[app.user.sessions.ids]]">
+        <template is="dom-if" if="[[app.user.sessions]]">
         <template is="dom-repeat" items="[[_getTimeslots(day.timeslots)]]" as="timeslot">
           <div class="timeslot" layout vertical$="{{app.isPhoneSize}}" horizontal$="{{!app.isPhoneSize}}">
 
@@ -207,7 +215,8 @@
               <template is="dom-repeat" items="[[session]]" as="subSession"
                         filter="{{_filterSession(filters.splices)}}">
 
-                <a href$="/schedule/[[name]]?sessionId=[[subSession.id]]" class="sub-session" with-background$="[[subSession.image]]" layout flex-auto>
+                <a href$="/schedule/[[name]]?sessionId=[[subSession.id]]" class="sub-session"
+                   with-background$="[[subSession.image]]" layout flex-auto wide$="{{!app.isPhoneSize}}">
                   <paper-card layout flex-auto>
 
                     <template is="dom-if" if="[[subSession.image]]">
@@ -230,21 +239,25 @@
                         </ul>
                       </div>
 
-                      <template is="dom-if" if="[[app.user]]">
-                        <div class="add-schedule" layout horizontal center>
-                          <iron-icon id= "[[subSession.id]]" class="remove" icon="remove" on-click="_removeSchedule"></iron-icon>
+                      <div class="bottom-caption" layout horizontal center justified>
+                        <div class="tags" layout horizontal center flex>
+                          <template is="dom-if" if="[[subSession.tags]]">
+                            <iron-icon icon="tags"></iron-icon>
+                            <span>[[_joinArray(subSession.tags)]]</span>
+                          </template>
                         </div>
-                      </template>
-
-                     <template is="dom-if" if="[[subSession.tags]]">
-                        <div class="tags" layout horizontal center>
-                          <iron-icon icon="tags"></iron-icon>
-                          <span>[[_joinArray(subSession.tags)]]</span>
-                        </div>
-                      </template>
+                        <template is="dom-if" if="[[app.user.sessions]]">
+                          <iron-icon
+                            class="action-icon show"
+                            icon="favorite"
+                            on-tap="_removeFavorites"
+                            session-id="[[subSession.id]]"
+                          ></iron-icon>
+                        </template>
+                      </div>
 
                       <template is="dom-if" if="[[subSession.speakers]]">
-                        <div class="speaker-block" relative>
+                        <div class="speaker-block" layout horizontal wrap relative>
                           <div class="image-overlay"
                                style$="background-color: [[_getCustomStyleValue(subSession.mainTag)]]" fit></div>
                           <template is="dom-repeat" items="[[subSession.speakers]]" as="speaker">
@@ -336,7 +349,7 @@
 
         _getTimeslots(timeslots) {
           var userTimeslots = [];
-          var savedSessionsIds = this.app.user.sessions.ids;
+          var savedSessionsIds = this.app.user.sessions;
 
           timeslots.map(function(timeslot) {
             var userSessions = [];
@@ -355,19 +368,22 @@
           return userTimeslots;
         },
 
-        _removeSchedule : function(e) {
-          var currentId = String(e.currentTarget.id);
-          var index = this.app.user.sessions.ids.indexOf(currentId);
-
-          if (index >= 0) {
-            this.app.user.sessions.ids.splice(index, 1);
-          }
-          e.currentTarget.parentElement.parentElement.parentElement.style.display = "none";
-
-          this.$.userSessions.data = this.app.user.sessions;
-          this.$.userSessions.save(this.userSessionsPath, String(this.app.user.uid));
-          e.preventDefault();
+        _removeFavorites: function (e) {
           e.stopPropagation();
+          e.preventDefault();
+          var id = e.target.sessionId.toString();
+          this.app.user.sessions = Object.keys(this.app.user.sessions).length !== 0
+                                    ? this.app.user.sessions
+                                    : [];
+          var arrayIndex = this.app.user.sessions.indexOf(id);
+
+          if (arrayIndex > -1) {
+            this.app.user.sessions.splice(arrayIndex, 1);
+            e.currentTarget.parentElement.parentElement.parentElement.style.display = "none";
+          }
+          
+          this.$.userSessions.data = this.app.user.sessions;
+          this.$.userSessions.save(this.userSessionsPath, this.app.user.uid);
         },
 
         _splitText: function (text, divider, index) {
