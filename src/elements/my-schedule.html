@@ -9,19 +9,10 @@
 
 <link rel="import" href="../behaviors/utils-behavior.html">
 
-<link rel="import" href="/bower_components/polymerfire/polymerfire.html">
-
 
 <dom-module id="my-schedule">
 
   <template>
-
-    <firebase-document
-      id="userSessions"
-      app-name="[[app.data.firebase.name]]"
-      path="[[userSessionsPath]]/[[app.user.uid]]"
-      data="{{app.user.sessions}}">
-    </firebase-document>
 
     <style include="shared-styles">
       :host {
@@ -191,7 +182,6 @@
       }
     </style>
 
-
       <template is="dom-repeat" items="[[schedule]]" as="day">
         <div class="timeslot" layout vertical>
           <div class="start-time">
@@ -304,7 +294,8 @@
 
         properties: {
           app: {
-            type: Object
+            type: Object,
+            notify: true
           },
 
           schedule: {
@@ -313,11 +304,6 @@
 
           day: {
             type: Object
-          },
-
-          userSessionsPath: {
-            type: String,
-            value: '/userSessions'
           },
 
           filters: {
@@ -347,7 +333,7 @@
           }
         },
 
-        _getTimeslots(timeslots) {
+        _getTimeslots: function(timeslots) {
           var userTimeslots = [];
           var savedSessionsIds = this.app.user.sessions;
 
@@ -378,12 +364,9 @@
           var arrayIndex = this.app.user.sessions.indexOf(id);
 
           if (arrayIndex > -1) {
-            this.app.user.sessions.splice(arrayIndex, 1);
+            this.splice('app.user.sessions', arrayIndex, 1);
             e.currentTarget.parentElement.parentElement.parentElement.style.display = "none";
           }
-          
-          this.$.userSessions.data = this.app.user.sessions;
-          this.$.userSessions.save(this.userSessionsPath, this.app.user.uid);
         },
 
         _splitText: function (text, divider, index) {

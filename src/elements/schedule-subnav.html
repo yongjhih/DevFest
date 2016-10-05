@@ -81,7 +81,7 @@
             </a>
           </paper-tab>
         </template>
-        <template is="dom-if" if="[[app.user]]">
+        <template is="dom-if" if="{{app.user.sessions.length}}">
           <paper-tab day="myschedule" link>
             <a href="/schedule/myschedule" layout center>
               [[localize('my-schedule')]]

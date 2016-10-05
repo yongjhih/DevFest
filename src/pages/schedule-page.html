@@ -45,6 +45,13 @@
       query-params="{{queryParams}}"
     ></app-route>
 
+    <firebase-document
+      id="userSessions"
+      app-name="[[app.data.firebase.name]]"
+      path="[[app.data.firebase.userSessionsPath]]/[[app.user.uid]]"
+      data="{{app.user.sessions}}">
+    </firebase-document>
+
     <div class="container" phone$="{{app.isPhoneSize}}">
       <schedule-subnav
         app="{{app}}"
@@ -62,7 +69,7 @@
             filters="[[filters]]"
           ></schedule-day>
         </template>
-        <template is="dom-if" if="[[app.user]]">
+        <template is="dom-if" if="{{app.user.sessions.length}}">
           <my-schedule
             name="myschedule"
             app={{app}}

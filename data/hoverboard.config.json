@@ -3,7 +3,8 @@
     "name": "hoverboard-dev",
     "domain": "hoverboard-dev.firebaseapp.com",
     "database": "https://hoverboard-dev.firebaseio.com",
-    "api": "AIzaSyBu9LI-hY4NfUOPJJKuV3BfQm7edLr2-aE"
+    "api": "AIzaSyBu9LI-hY4NfUOPJJKuV3BfQm7edLr2-aE",
+    "userSessionsPath": "/userSessions"
   },
   "pages": {
     "home": {

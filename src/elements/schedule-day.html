@@ -9,21 +9,12 @@
 
 <link rel="import" href="../behaviors/utils-behavior.html">
 
-<link rel="import" href="/bower_components/polymerfire/polymerfire.html">
-
 
 <dom-module id="schedule-day">
 
   <template>
 
-    <firebase-document
-      id="userSessions"
-      app-name="[[app.data.firebase.name]]"
-      path="[[userSessionsPath]]/[[app.user.uid]]"
-      data="{{app.user.sessions}}">
-    </firebase-document>
-
-   <style include="shared-styles">
+    <style include="shared-styles">
       :host {
         display: block;
         --paper-card-background-color: var(--secondary-background-color);
@@ -216,19 +207,19 @@
 
                     <div class="overlay" relative layout vertical flex>
                       <div class="sub-session-content" flex>
-                          <h2 class="session-title">[[subSession.title]]</h2>
-                          <ul class="session-meta">
-                            <template is="dom-if" if="[[subSession.language]]">
-                              <li>[[subSession.language]]</li>
-                            </template>
-                            <template is="dom-if" if="[[subSession.complexity]]">
-                              <li>[[subSession.complexity]]</li>
-                            </template>
-                            <template is="dom-if" if="[[subSession.track.title]]">
-                              <li>[[subSession.track.title]]</li>
-                            </template>
-                          </ul>
-                     </div>
+                        <h2 class="session-title">[[subSession.title]]</h2>
+                        <ul class="session-meta">
+                          <template is="dom-if" if="[[subSession.language]]">
+                            <li>[[subSession.language]]</li>
+                          </template>
+                          <template is="dom-if" if="[[subSession.complexity]]">
+                            <li>[[subSession.complexity]]</li>
+                          </template>
+                          <template is="dom-if" if="[[subSession.track.title]]">
+                            <li>[[subSession.track.title]]</li>
+                          </template>
+                        </ul>
+                      </div>
 
                       <div class="bottom-caption" layout horizontal center justified>
                         <div class="tags" layout horizontal center flex>
@@ -294,16 +285,12 @@
 
         properties: {
           app: {
-            type: Object
+            type: Object,
+            notify: true
           },
 
           day: {
             type: Object
-          },
-
-          userSessionsPath: {
-            type: String,
-            value: '/userSessions'
           },
 
           filters: {
@@ -361,23 +348,24 @@
           var arrayIndex = this.app.user.sessions.indexOf(id);
 
           if (arrayIndex < 0) {
-            this.app.user.sessions.push(id);
+            if(!this.app.user.sessions.length) {
+              this.set('app.user.sessions', [id]);
+            } else {
+              this.push('app.user.sessions', id);
+            }
             e.target.icon = 'favorite';
             e.target.classList.add('show');
           } else {
-            this.app.user.sessions.splice(arrayIndex, 1);
+            this.splice('app.user.sessions', arrayIndex, 1);
             e.target.icon = 'favorite-border';
             e.target.classList.remove('show');
           }
-
-          this.$.userSessions.data = this.app.user.sessions;
-          this.$.userSessions.save(this.userSessionsPath, this.app.user.uid);
         },
 
         _getFavoriteIcon: function (id) {
           this.app.user.sessions = Object.keys(this.app.user.sessions || {}).length !== 0
-                                    ? this.app.user.sessions
-                                    : [];
+            ? this.app.user.sessions
+            : [];
 
           return this._isFavorite(id) ? 'favorite' : 'favorite-border';
         },
@@ -386,7 +374,7 @@
           return 'action-icon' + (this._isFavorite(id) ? ' show' : '');
         },
 
-        _isFavorite: function(id) {
+        _isFavorite: function (id) {
           return this.app.user.sessions.indexOf(id.toString()) > -1;
         }
 
