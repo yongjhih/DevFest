@@ -153,7 +153,7 @@
         transition: opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
-      .sub-session[wide] .action-icon.show {
+      .sub-session[wide] .action-icon.favorite {
         opacity: 1;
       }
 
@@ -230,7 +230,7 @@
                         </div>
                         <template is="dom-if" if="[[app.user.sessions]]">
                           <iron-icon
-                            class$="[[_getFavoriteIconClass(subSession.id)]]"
+                            class$="action-icon [[_getFavoriteIcon(subSession.id)]]"
                             icon="[[_getFavoriteIcon(subSession.id)]]"
                             on-tap="_toggleFavorites"
                             session-id="[[subSession.id]]"
@@ -354,11 +354,11 @@
               this.push('app.user.sessions', id);
             }
             e.target.icon = 'favorite';
-            e.target.classList.add('show');
+            e.target.classList.add('favorite');
           } else {
             this.splice('app.user.sessions', arrayIndex, 1);
             e.target.icon = 'favorite-border';
-            e.target.classList.remove('show');
+            e.target.classList.remove('favorite');
           }
         },
 
@@ -368,10 +368,6 @@
             : [];
 
           return this._isFavorite(id) ? 'favorite' : 'favorite-border';
-        },
-
-        _getFavoriteIconClass: function (id) {
-          return 'action-icon' + (this._isFavorite(id) ? ' show' : '');
         },
 
         _isFavorite: function (id) {
