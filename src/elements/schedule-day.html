@@ -231,7 +231,7 @@
                         <template is="dom-if" if="[[app.user.sessions]]">
                           <iron-icon
                             class$="action-icon [[_getFavoriteIcon(subSession.id)]]"
-                            icon="[[_getFavoriteIcon(subSession.id)]]"
+                            icon="[[_getFavoriteIcon(subSession.id, app.user.sessions)]]"
                             on-tap="_toggleFavorites"
                             session-id="[[subSession.id]]"
                           ></iron-icon>
