@@ -8,6 +8,8 @@
 <link rel="import" href="../../bower_components/neon-animation/neon-shared-element-animatable-behavior.html">
 
 <link rel="import" href="../behaviors/utils-behavior.html">
+<link rel="import" href="../behaviors/localize-behavior.html">
+
 
 
 <dom-module id="schedule-day">
@@ -153,7 +155,7 @@
         transition: opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
-      .sub-session[wide] .action-icon.favorite {
+      .sub-session[wide] .action-icon.remove {
         opacity: 1;
       }
 
@@ -230,10 +232,17 @@
                         </div>
                         <template is="dom-if" if="[[app.user.sessions]]">
                           <iron-icon
-                            class$="action-icon [[_getFavoriteIcon(subSession.id)]]"
-                            icon="[[_getFavoriteIcon(subSession.id, app.user.sessions)]]"
-                            on-tap="_toggleFavorites"
+                            class$="action-icon [[_getMyScheduleIcon(subSession.id)]]"
+                            icon="[[_getMyScheduleIcon(subSession.id, app.user.sessions)]]"
+                            on-tap="_toggleMySchedule"
                             session-id="[[subSession.id]]"
+                          ></iron-icon>
+                        </template>
+                        <template is="dom-if" if="[[!app.user]]">
+                          <iron-icon
+                            class="action-icon add"
+                            icon="add"
+                            on-tap="_showToastToSingIn"
                           ></iron-icon>
                         </template>
                       </div>
@@ -280,7 +289,8 @@
 
         behaviors: [
           Polymer.NeonSharedElementAnimatableBehavior,
-          HOVERBOARD.UtilsBehavior
+          HOVERBOARD.UtilsBehavior,
+          HOVERBOARD.LocalizeBehavior
         ],
 
         properties: {
@@ -340,7 +350,7 @@
           };
         },
 
-        _toggleFavorites: function (e) {
+        _toggleMySchedule: function (e) {
           e.stopPropagation();
           e.preventDefault();
           var id = e.target.sessionId.toString();
@@ -353,27 +363,37 @@
             } else {
               this.push('app.user.sessions', id);
             }
-            e.target.icon = 'favorite';
-            e.target.classList.add('favorite');
+            e.target.icon = 'remove';
+            e.target.classList.add('remove');
           } else {
             this.splice('app.user.sessions', arrayIndex, 1);
-            e.target.icon = 'favorite-border';
-            e.target.classList.remove('favorite');
+            e.target.icon = 'add';
+            e.target.classList.remove('remove');
           }
         },
 
-        _getFavoriteIcon: function (id) {
+        _getMyScheduleIcon: function (id) {
           this.app.user.sessions = Object.keys(this.app.user.sessions || {}).length !== 0
             ? this.app.user.sessions
             : [];
 
-          return this._isFavorite(id) ? 'favorite' : 'favorite-border';
+          return this._isAddedToMySchedule(id) ? 'remove' : 'add';
         },
 
-        _isFavorite: function (id) {
+        _isAddedToMySchedule: function (id) {
           return this.app.user.sessions.indexOf(id.toString()) > -1;
-        }
+        },
 
+        _showToastToSingIn: function(e) {
+          e.stopPropagation();
+          e.preventDefault();
+
+          if (HOVERBOARD.Elements && HOVERBOARD.Elements.Template &&
+            HOVERBOARD.Elements.Template.$.toast.showMessage) {
+            HOVERBOARD.Elements.Template.$.toast.showMessage(
+              this.localize('you-should-sign-in'), HOVERBOARD.Elements.Template.signIn, this.localize('sign-in'));
+          }
+        }
       });
 
     }());

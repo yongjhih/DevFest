@@ -83,5 +83,6 @@
   "sign-in": "Sign in",
   "sign-out": "Sign out",
   "my-schedule": "My Schedule",
-  "browse-more": "Browse more events"
+  "browse-more": "Browse more events",
+  "you-should-sign-in": "Sign in to save sessions"
 }
