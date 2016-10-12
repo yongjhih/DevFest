@@ -230,7 +230,7 @@
                         </div>
                         <template is="dom-if" if="[[app.user.sessions]]">
                           <iron-icon
-                            class$="action-icon [[_getFavoriteIcon(subSession.id)]]"
+                            class$="action-icon [[_getFavoriteIcon(subSession.id, app.user.sessions)]]"
                             icon="[[_getFavoriteIcon(subSession.id, app.user.sessions)]]"
                             on-tap="_toggleFavorites"
                             session-id="[[subSession.id]]"
@@ -343,37 +343,29 @@
         _toggleFavorites: function (e) {
           e.stopPropagation();
           e.preventDefault();
-          var id = e.target.sessionId.toString();
-          this.app.user.sessions = Object.keys(this.app.user.sessions).length !== 0 ? this.app.user.sessions : [];
-          var arrayIndex = this.app.user.sessions.indexOf(id);
+          var id = e.target.sessionId;
 
-          if (arrayIndex < 0) {
-            if(!this.app.user.sessions.length) {
-              this.set('app.user.sessions', [id]);
-            } else {
-              this.push('app.user.sessions', id);
-            }
-            e.target.icon = 'favorite';
-            e.target.classList.add('favorite');
-          } else {
-            this.splice('app.user.sessions', arrayIndex, 1);
+          if (this.app.user.sessions && this.app.user.sessions[id]) {
+            this.set('app.user.sessions.'+ id, null);
             e.target.icon = 'favorite-border';
             e.target.classList.remove('favorite');
+          } else {
+            if (!this.app.user.sessions) {
+              this.app.user.sessions = {};
+            }
+            this.set('app.user.sessions.'+ id, true);
+            e.target.icon = 'favorite';
+            e.target.classList.add('favorite');
           }
         },
 
         _getFavoriteIcon: function (id) {
-          this.app.user.sessions = Object.keys(this.app.user.sessions || {}).length !== 0
-            ? this.app.user.sessions
-            : [];
+          if (!this.app.user.sessions) {
+            this.app.user.sessions = {};
+          }
 
-          return this._isFavorite(id) ? 'favorite' : 'favorite-border';
+          return this.app.user.sessions[id] ? 'favorite' : 'favorite-border';
         },
-
-        _isFavorite: function (id) {
-          return this.app.user.sessions.indexOf(id.toString()) > -1;
-        }
-
       });
 
     }());

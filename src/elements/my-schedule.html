@@ -359,15 +359,11 @@
         _removeFavorites: function (e) {
           e.stopPropagation();
           e.preventDefault();
-          var id = e.target.sessionId.toString();
-          this.app.user.sessions = Object.keys(this.app.user.sessions).length !== 0
-            ? this.app.user.sessions
-            : [];
-          var arrayIndex = this.app.user.sessions.indexOf(id);
+          var id = e.target.sessionId;
 
-          if (arrayIndex > -1) {
-            this.splice('app.user.sessions', arrayIndex, 1);
-            e.currentTarget.parentElement.parentElement.parentElement.style.display = "none";
+          if (this.app.user.sessions && this.app.user.sessions[id]) {
+            this.set('app.user.sessions.'+ id, null);
+            e.currentTarget.parentElement.parentElement.parentElement.style.display = 'none';
           }
         },
 
@@ -388,7 +384,7 @@
           return function (timeslot) {
             var result = false;
             timeslot.sessions.map(function (session) {
-              if (savedSessionsIds.indexOf(String(session[0].id)) >= 0) {
+              if (savedSessionsIds[session[0].id]) {
                 result = true;
               }
             });
@@ -400,7 +396,7 @@
           var filters = this.filters || [];
 
           return function (session) {
-            return savedSessionsIds.indexOf(String(session.id)) >= 0
+            return savedSessionsIds[session.id]
               || (filters.length && filters.indexOf(session.mainTag) > -1);
           };
         }

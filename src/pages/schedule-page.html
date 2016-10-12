@@ -76,7 +76,7 @@
             filters="[[filters]]"
           ></schedule-day>
         </template>
-        <template is="dom-if" if="{{app.user.sessions.length}}">
+        <template is="dom-if" if="{{app.user}}">
           <my-schedule
             name="myschedule"
             app={{app}}
