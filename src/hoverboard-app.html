@@ -13,8 +13,6 @@
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 
 <link rel="import" href="../bower_components/polymerfire/polymerfire.html">
-<link rel="import" href="../bower_components/app-storage/app-indexeddb-mirror/app-indexeddb-mirror.html">
-
 
 <link rel="import" href="../bower_components/neon-animation/neon-animated-pages.html">
 
@@ -337,7 +335,7 @@
         signIn: function () {
           var google = new firebase.auth.GoogleAuthProvider();
           google.addScope('https://www.googleapis.com/auth/userinfo.email');
-          this.$.auth.signInWithPopup(google);
+          HOVERBOARD.Elements.Template.$.auth.signInWithPopup(google);
         },
 
         signOut: function () {

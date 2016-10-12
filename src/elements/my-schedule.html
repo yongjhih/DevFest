@@ -253,8 +253,8 @@
                             <template is="dom-if" if="[[app.user.sessions]]">
                               <iron-icon
                                 class="action-icon show"
-                                icon="favorite"
-                                on-tap="_removeFavorites"
+                                icon="remove"
+                                on-tap="_removeFromMySchedule"
                                 session-id="[[subSession.id]]"
                               ></iron-icon>
                             </template>
@@ -356,7 +356,7 @@
           }
         },
 
-        _removeFavorites: function (e) {
+        _removeFromMySchedule: function (e) {
           e.stopPropagation();
           e.preventDefault();
           var id = e.target.sessionId;
@@ -384,7 +384,7 @@
           return function (timeslot) {
             var result = false;
             timeslot.sessions.map(function (session) {
-              if (savedSessionsIds[session[0].id]) {
+              if (savedSessionsIds && savedSessionsIds[session[0].id]) {
                 result = true;
               }
             });
@@ -396,7 +396,7 @@
           var filters = this.filters || [];
 
           return function (session) {
-            return savedSessionsIds[session.id]
+            return (savedSessionsIds && savedSessionsIds[session.id])
               || (filters.length && filters.indexOf(session.mainTag) > -1);
           };
         }
