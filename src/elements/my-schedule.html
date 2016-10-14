@@ -6,6 +6,7 @@
 <link rel="import" href="../../bower_components/paper-card/paper-card.html">
 
 <link rel="import" href="../../bower_components/neon-animation/neon-shared-element-animatable-behavior.html">
+<link rel="import" href="../../bower_components/app-storage/app-network-status-behavior.html">
 
 <link rel="import" href="../behaviors/utils-behavior.html">
 <link rel="import" href="../behaviors/localize-behavior.html">
@@ -154,8 +155,21 @@
         transition: opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
-      .sub-session[wide] .action-icon.show {
+      .sub-session[wide] .action-icon.remove {
         opacity: 1;
+      }
+
+      .sub-session[wide]:hover .action-icon[offline] {
+        opacity: 0.5;
+      }
+
+      .sub-session[wide] .action-icon.remove[offline] {
+        opacity: 0.5;
+      }
+
+      .action-icon[offline] {
+        opacity: 0.5;
+        cursor: default;
       }
 
       .tags iron-icon {
@@ -256,6 +270,7 @@
                                 icon="remove"
                                 on-tap="_removeFromMySchedule"
                                 session-id="[[subSession.id]]"
+                                offline$="[[!online]]"
                               ></iron-icon>
                             </template>
                           </div>
@@ -311,6 +326,7 @@
 
         behaviors: [
           Polymer.NeonSharedElementAnimatableBehavior,
+          Polymer.AppNetworkStatusBehavior,
           HOVERBOARD.LocalizeBehavior,
           HOVERBOARD.UtilsBehavior
         ],
