@@ -135,7 +135,7 @@
       }
 
       .bottom-caption {
-        padding: 16px 24px;
+        position: relative;
         font-size: 13px;
         color: var(--secondary-text-color);
       }
@@ -144,9 +144,13 @@
         --iron-icon-width: 20px;
         --iron-icon-height: 20px;
         margin-left: 16px;
+        padding: 16px 24px;
+        position: absolute;
+        right: 0;
+        bottom: 0;
       }
 
-      .sub-session[with-background][wide] .action-icon {
+      .sub-session[with-background] .action-icon {
         color: #fff;
       }
 
@@ -157,6 +161,10 @@
 
       .sub-session[wide] .action-icon.remove {
         opacity: 1;
+      }
+
+      .tags {
+        padding: 16px 24px;
       }
 
       .tags iron-icon {
@@ -224,12 +232,12 @@
                       </div>
 
                       <div class="bottom-caption" layout horizontal center justified>
-                        <div class="tags" layout horizontal center flex>
-                          <template is="dom-if" if="[[subSession.tags]]">
-                            <iron-icon icon="tags"></iron-icon>
-                            <span>[[_joinArray(subSession.tags)]]</span>
-                          </template>
-                        </div>
+                        <template is="dom-if" if="[[subSession.tags]]">
+                          <div class="tags" layout horizontal center flex>
+                              <iron-icon icon="tags"></iron-icon>
+                              <span>[[_joinArray(subSession.tags)]]</span>
+                          </div>
+                        </template>
                         <template is="dom-if" if="[[app.user.sessions]]">
                           <iron-icon
                             class$="action-icon [[_getMyScheduleIcon(subSession.id, app.user.sessions)]]"
