@@ -108,7 +108,9 @@
       }
 
       .profile-details .profile-image {
-        margin-right: 8px;
+        margin-right: 16px;
+        width: 48px;
+        height: 48px;
       }
 
       .profile-name,
@@ -119,11 +121,8 @@
         color: var(--secondary-text-color);
       }
 
-      .profile-content {
-        padding: 8px 16px;
-      }
-
       .profile-action {
+        margin-top: 4px;
         text-transform: uppercase;
         color: var(--default-primary-color);
         font-size: 14px;
@@ -179,10 +178,8 @@
                     <div layout vertical center-justified>
                       <span class="profile-name">[[app.user.displayName]]</span>
                       <span class="profile-email">[[app.user.email]]</span>
+                      <span class="profile-action" role="button" on-tap="signOut">[[localize('sign-out')]]</span>
                     </div>
-                  </div>
-                  <div class="profile-content">
-                    <span class="profile-action" role="button" on-tap="signOut">[[localize('sign-out')]]</span>
                   </div>
                 </div>
               </paper-menu-button>
