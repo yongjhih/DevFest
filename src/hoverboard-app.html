@@ -128,6 +128,7 @@
     </firebase-app>
     <firebase-auth
       id="auth"
+      provider="google"
       app-name="[[app.data.firebase.name]]"
       user="{{app.user}}"
     >
@@ -333,9 +334,7 @@
         },
 
         signIn: function () {
-          var google = new firebase.auth.GoogleAuthProvider();
-          google.addScope('https://www.googleapis.com/auth/userinfo.email');
-          HOVERBOARD.Elements.Template.$.auth.signInWithPopup(google);
+          HOVERBOARD.Elements.Template.$.auth.signInWithPopup();
         },
 
         signOut: function () {
