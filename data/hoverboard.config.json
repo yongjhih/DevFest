@@ -10,7 +10,7 @@
     "home": {
       "headerSettings": {
         "backgroundColor": "#FF9800",
-        "backgroundImage": "/images/backgrounds/home.png",
+        "backgroundImage": "/DevFest/images/backgrounds/home.png",
         "fontColor": "#fff",
         "tabBarColor": "#fff"
       }
@@ -174,7 +174,7 @@
       "url": "https://www.linkedin.com/company/480844"
     }
   ],
-  "tweetsSource": "/data/tweets.json",
+  "tweetsSource": "/DevFest/data/tweets.json",
   "location": {
     "apiKey": "",
     "link": "https://www.facebook.com/pages/%E5%9C%8B%E7%AB%8B%E5%8F%B0%E7%81%A3%E5%A4%A7%E5%AD%B8%E6%99%AE%E9%80%9A%E6%95%99%E5%AD%B8%E9%A4%A8/194021344011331",
