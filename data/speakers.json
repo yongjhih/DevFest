@@ -279,8 +279,8 @@
         "companyLogo": "",
         "country": "Taipei, Taiwan",
         "photoUrl": "https://avatars0.githubusercontent.com/u/213736?v=3&s=96",
-        "shortBio": "",
-        "bio": "",
+        "shortBio": "樂於將 Android App 開發上的各式工具包開源",
+        "bio": "樂於將 Android App 開發上的各式工具包開源，也持續關注 Android App 各式開源函式庫對於開發上的影響",
         "tags": [
             "Android"
         ],
@@ -288,7 +288,7 @@
 
         ],
         "socials": [
-
+            "github": "https://github.com/yongjhih"
         ]
     },
     "14": {
